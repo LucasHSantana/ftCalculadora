@@ -1,9 +1,12 @@
+// Componente que compõe uma lista de botões para criar uma linha com vários botões
+
 import 'package:flutter/material.dart';
 import 'button.dart';
 
 class ButtonRow extends StatelessWidget {
   final List<Button> buttons;
 
+  // Construtor
   ButtonRow(this.buttons);
 
   @override

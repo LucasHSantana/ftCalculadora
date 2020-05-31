@@ -1,10 +1,14 @@
+// Componente que compõe os botões do teclado (números e operadores)
+
 import 'package:flutter/material.dart';
 import 'button_row.dart';
 import 'button.dart';
 
+// Classes stateless seguem a estrutura abaixo
 class Keyboard extends StatelessWidget {
-  final void Function(String) cb;
+  final void Function(String) cb; //Funcão de callback
 
+  //Construtor
   Keyboard(this.cb);
 
   @override

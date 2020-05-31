@@ -1,3 +1,5 @@
+// Componente personalizado de botão
+
 import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
@@ -9,6 +11,7 @@ class Button extends StatelessWidget {
   final Color color;
   final void Function(String) cb;
 
+  // Construtor padrão
   Button({
     @required this.text,
     this.big = false, 
@@ -16,6 +19,7 @@ class Button extends StatelessWidget {
     @required this.cb,
   });
 
+  // Construtor para botões grandes
   Button.big({
     @required this.text,
     this.big = true, 
@@ -23,6 +27,7 @@ class Button extends StatelessWidget {
     @required this.cb,
   });
 
+  // Construtor para botões de operadores
   Button.operation({
     @required this.text,
     this.big = false, 
@@ -33,7 +38,7 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        flex: big ? 2 : 1,
+        flex: big ? 2 : 1, // Se o botão for grande, ocupa dois espaços na grid, senão apenas um.
         child: RaisedButton(
           color: this.color,
           child: Text(
