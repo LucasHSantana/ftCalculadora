@@ -10,29 +10,33 @@ class Button extends StatelessWidget {
   final bool big;
   final Color color;
   final void Function(String) cb;
+  final bool enabled;
 
   // Construtor padrão
   Button({
     @required this.text,
-    this.big = false, 
-    this.color = DEFAULT,
     @required this.cb,
+    this.big = false, 
+    this.color = DEFAULT,  
+    this.enabled = true,
   });
 
   // Construtor para botões grandes
   Button.big({
     @required this.text,
-    this.big = true, 
-    this.color = DEFAULT,
     @required this.cb,
+    this.big = true, 
+    this.color = DEFAULT,    
+    this.enabled = true,
   });
 
   // Construtor para botões de operadores
   Button.operation({
     @required this.text,
-    this.big = false, 
-    this.color = OPERATION,
     @required this.cb,
+    this.big = false, 
+    this.color = OPERATION,    
+    this.enabled = true
   });
 
   @override
@@ -45,11 +49,11 @@ class Button extends StatelessWidget {
             this.text,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 32,
+              fontSize: 25,
               fontWeight: FontWeight.w300,
             ),
           ),
-          onPressed: () => cb(text),
+          onPressed: enabled ? () => cb(text): null,
       ),
     );
   }

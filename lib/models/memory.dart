@@ -1,6 +1,6 @@
 // Classe que faz todas as operações de calculo ao ser pressionado algo no teclado
 class Memory {
-  static const OPER = ['%', '/', 'x', '-', '+', '='];
+  static const OPER = ['%', '÷', 'x', '-', '+', '=', '¹/x', 'x²', '√'];
   final _buffer = [0.0, 0.0];
   int _bufferIndex = 0;
   bool _wipeValue = false;
@@ -11,9 +11,12 @@ class Memory {
 
   //Função chamada no callback dos botões, determina o que será feito
   void applyCommand(String command) {
-    // Caso for pressionado o botão "AC", todas as váriaveis serão limpas.
-    if (command == 'AC') { 
+    // Caso for pressionado o botão "C", todas as váriaveis serão limpas.
+    if (command == 'C') { 
       _allClear();
+    // Caso for pressionado o botão "CE", será limpo a váriavel de valor atual (somente a entrada atual).
+    } else if (command == 'CE'){
+      _cancelEntry();
     // Caso for pressionado algum botão de operador,
     // será setada a operação correspondente e realizado o calculo se necessário.
     } else if (OPER.contains(command)) {
@@ -79,6 +82,10 @@ class Memory {
       _expandedText += _value + ' ' + newOperation + ' ';
     }    
 
+    if (_operation != '' && newOperation != _operation && _buffer[1] == 0.0){
+      _expandedText = _expandedText.replaceFirst(_operation, newOperation, _expandedText.length -2);
+    }
+
     _bufferIndex = 1;
 
     // Sempre que for pressionado um operador, a próxima vez que pressionar um número,
@@ -103,7 +110,7 @@ class Memory {
   // Operações realizadas
   _doOperation() {
     switch (_operation) {
-      case '/':
+      case '÷':
         _buffer[0] = _buffer[0] / _buffer[1];
         break;
       case 'x':
@@ -138,6 +145,11 @@ class Memory {
     _operation = '';
     _isPercent = false;
     _wipeValue = false;
+  }
+
+  _cancelEntry(){
+    _value = '0';
+    _buffer[1] = 0.0;
   }
 
   // getter do _value
