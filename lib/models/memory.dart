@@ -7,7 +7,12 @@ class Memory {
   bool _isPercent = false;
   String _value = '0';
   String _expandedText = '';
-  String _operation;
+  String _operation = '';
+  String _lastOperation = '';
+
+  Memory(){
+    _allClear();
+  }
 
   //Função chamada no callback dos botões, determina o que será feito
   void applyCommand(String command) {
@@ -59,6 +64,10 @@ class Memory {
   }
 
   _setOperation(String newOperation) {
+    // Sempre que for pressionado um operador, a próxima vez que pressionar um número,
+    // O valor será limpo para mostrar o número pressionado corretamente.
+    _wipeValue = true;
+
     // Se o operador for '%', tem uma execução diferenciada
     if (newOperation == '%' && _buffer[1] != 0.0) {
       _doPercent();
@@ -67,10 +76,15 @@ class Memory {
 
     // Se for pressionado um operador diferente de '=' porém o 
     // operador pressionado anteriormente for '=', terá uma tratativa diferenciada
-    if (_operation == '=' && (newOperation != '=' || newOperation == '=')) {
+    if (_lastOperation == '=' && (newOperation != '=')) {
       _buffer[0] = double.tryParse(_value) ?? 0;
       _buffer[1] = 0.0;
       _expandedText = _value + ' ' + newOperation + ' ';
+    } else if (newOperation == '=' && _lastOperation == '='){      
+      _buffer[0] = double.tryParse(_value) ?? 0;
+      _expandedText = _value + ' ' + _operation + ' ' + _tryInt(_buffer[1]) + ' ' + newOperation + ' ';      
+      _doOperation();
+      return;
     }
 
     // Se o operador for '=', e o operador anterior for '%', 
@@ -87,15 +101,16 @@ class Memory {
     }
 
     _bufferIndex = 1;
-
-    // Sempre que for pressionado um operador, a próxima vez que pressionar um número,
-    // O valor será limpo para mostrar o número pressionado corretamente.
-    _wipeValue = true;
+    
     if (_buffer[1] != 0.0) {
       _doOperation();
     }
 
-    _operation = newOperation;
+    if (newOperation != '='){
+      _operation = newOperation;
+    }
+
+    _lastOperation = newOperation;
     _isPercent = false;
   }
 
@@ -126,12 +141,17 @@ class Memory {
         break;
     }
 
-    _buffer[1] = 0.0;
+    // _buffer[1] = 0.0;
 
-    if (_buffer[0] % 1 == 0) {
-      _value = _buffer[0].toInt().toString();
+    _value = _tryInt(_buffer[0]);
+  }
+
+  // Tenta converter valor para inteiro, senão retorna valor original
+  _tryInt(double value){
+    if (value % 1 == 0) {
+      return value.toInt().toString();
     } else {
-      _value = _buffer[0].toString();
+      return value.toString();
     }
   }
 
@@ -143,6 +163,7 @@ class Memory {
     _buffer[1] = 0.0;
     _bufferIndex = 0;
     _operation = '';
+    _lastOperation = '';
     _isPercent = false;
     _wipeValue = false;
   }
