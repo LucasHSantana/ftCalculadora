@@ -149,7 +149,7 @@ class Memory {
       _buffer[0] = 0;
       _expandedText = _value;
     } else {
-      _value = (_buffer[1] / 100).toString();
+      _value = (_buffer[0] * (_buffer[1] / 100)).toString();
       _buffer[1] = double.tryParse(_value) ?? 0;
       _expandedText += _value + ' ';
       _isSpecial = true;
