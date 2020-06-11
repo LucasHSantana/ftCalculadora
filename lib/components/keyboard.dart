@@ -26,9 +26,9 @@ class Keyboard extends StatelessWidget {
           SizedBox(height: 1),
 
           ButtonRow([
-            Button.operation(text: '¹/x', cb: cb, enabled: false),
-            Button.operation(text: 'x²', cb: cb, enabled: false),
-            Button.operation(text: '√', cb: cb, enabled: false),
+            Button.operation(text: '¹/x', cb: cb),
+            Button.operation(text: 'x²', cb: cb),
+            Button.operation(text: '√', cb: cb),
             Button.operation(text: '÷', cb: cb),
           ]),
 

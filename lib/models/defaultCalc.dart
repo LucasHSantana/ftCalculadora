@@ -1,10 +1,15 @@
 // Classe que faz todas as operações de calculo ao ser pressionado algo no teclado
+import 'dart:io';
+
+import 'dart:math';
+
 class Memory {
   static const OPER = ['%', '÷', 'x', '-', '+', '=', '¹/x', 'x²', '√'];
   final _buffer = [0.0, 0.0];
   int _bufferIndex = 0;
   bool _wipeValue = false;
-  bool _isPercent = false;
+  bool _wipeAll = false;
+  bool _isSpecial = false;
   String _value = '0';
   String _expandedText = '';
   String _operation = '';
@@ -16,6 +21,10 @@ class Memory {
 
   //Função chamada no callback dos botões, determina o que será feito
   void applyCommand(String command) {
+    if (_wipeAll){
+      _allClear();    
+    }
+
     // Caso for pressionado o botão "C", todas as váriaveis serão limpas.
     if (command == 'C') { 
       _allClear();
@@ -68,9 +77,22 @@ class Memory {
     // O valor será limpo para mostrar o número pressionado corretamente.
     _wipeValue = true;
 
+    if (_bufferIndex == 1 && _buffer[1] == 0.0) {
+      _buffer[1] = double.tryParse(_value) ?? 0;
+    }
+
     // Se o operador for '%', tem uma execução diferenciada
-    if (newOperation == '%' && _buffer[1] != 0.0) {
+    if (newOperation == '%') {
       _doPercent();
+      return;
+    } else if (newOperation == '¹/x') {
+      _doFrac();
+      return;
+    } else if (newOperation == 'x²') {
+      _doExp();
+      return;
+    } else if (newOperation == '√') {
+      _doSqrt();
       return;
     }
 
@@ -87,15 +109,21 @@ class Memory {
       return;
     }
 
-    // Se o operador for '=', e o operador anterior for '%', 
+    // Se o operador anterior for "especial", 
     // O valor será mostrado de forma diferenciada na tela.
-    if (newOperation == '=' && _isPercent) {
+    if (_isSpecial) {
       _expandedText += newOperation + ' ';    
     // Operadores normais serão mostrados normalmente na tela
     } else if (_bufferIndex == 0 || _buffer[1] != 0.0) {
-      _expandedText += _value + ' ' + newOperation + ' ';
+      if (_expandedText == '0'){
+        _expandedText = _value + ' ' + newOperation + ' ';
+      } else {
+        _expandedText += _value + ' ' + newOperation + ' ';
+      }      
     }    
 
+    // Caso tenha sido pressionado um operador e depois pressionado outro operador sem digitar um valor,
+    // apenas troca o simbolo, para não deixar o simbolo errado na tela
     if (_operation != '' && newOperation != _operation && _buffer[1] == 0.0){
       _expandedText = _expandedText.replaceFirst(_operation, newOperation, _expandedText.length -2);
     }
@@ -111,15 +139,77 @@ class Memory {
     }
 
     _lastOperation = newOperation;
-    _isPercent = false;
+    _isSpecial = false;
   }
 
   // Operação quando for pressionado '%'
   _doPercent() {
-    _value = (_buffer[1] / 100).toString();
-    _buffer[1] = double.tryParse(_value) ?? 0;
-    _expandedText += _value + ' ';
-    _isPercent = true;
+    if (_bufferIndex == 0){
+      _value = '0';
+      _buffer[0] = 0;
+      _expandedText = _value;
+    } else {
+      _value = (_buffer[1] / 100).toString();
+      _buffer[1] = double.tryParse(_value) ?? 0;
+      _expandedText += _value + ' ';
+      _isSpecial = true;
+    }
+  }
+
+  _doFrac() {
+    double value = _bufferIndex == 0 ? _buffer[0] : _buffer[1];
+
+    if (value == 0.0) {
+      _value = 'Não é possível dividir por zero‬';
+      _wipeAll = true;
+      return;
+    }
+
+    try {      
+      _expandedText += '1/(' + value.toString() + ') ';
+      value = (1 / value);
+      _value = value.toString();
+      if (_bufferIndex == 0) {
+        _buffer[0] = value;
+      } else {
+        _buffer[1] = value;
+      }
+
+      _isSpecial = true;
+    } catch(e) {      
+      _value = e.errMsg();
+    }
+  }
+
+  _doExp() {
+    double value = _bufferIndex == 0 ? _buffer[0] : _buffer[1];
+
+    _expandedText += 'sqr(' + _value + ') ';
+    value = pow(value, 2);
+    _value = value.toString();
+    if (_bufferIndex == 0) {
+      _buffer[0] = value;
+    } else {
+      _buffer[1] = value;
+    }
+
+    _isSpecial = true;
+  }
+
+  _doSqrt() {
+    double value = _bufferIndex == 0 ? _buffer[0] : _buffer[1];
+
+    _expandedText += '√(' + _value + ') ';
+    value = sqrt(value);
+    _value = value.toString();
+
+    if (_bufferIndex == 0) {
+      _buffer[0] = value;
+    } else {
+      _buffer[1] = value;
+    }
+
+    _isSpecial = true;
   }
 
   // Operações realizadas
@@ -164,8 +254,9 @@ class Memory {
     _bufferIndex = 0;
     _operation = '';
     _lastOperation = '';
-    _isPercent = false;
+    _isSpecial = false;
     _wipeValue = false;
+    _wipeAll = false;
   }
 
   _cancelEntry(){

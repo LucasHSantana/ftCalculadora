@@ -1,6 +1,6 @@
 // Componente principal
 
-import 'package:Calculadora/models/memory.dart';
+import 'package:Calculadora/models/defaultCalc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../components/display.dart';
