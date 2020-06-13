@@ -1,6 +1,4 @@
 // Classe que faz todas as operações de calculo ao ser pressionado algo no teclado
-import 'dart:io';
-
 import 'dart:math';
 
 class Memory {
@@ -31,6 +29,9 @@ class Memory {
     // Caso for pressionado o botão "CE", será limpo a váriavel de valor atual (somente a entrada atual).
     } else if (command == 'CE'){
       _cancelEntry();
+    // Caso for pressionado o botão "+/-", será trocado o sinal do valor
+    } else if (command == '+/-'){
+      _changeValueSignal();    
     // Caso for pressionado algum botão de operador,
     // será setada a operação correspondente e realizado o calculo se necessário.
     } else if (OPER.contains(command)) {
@@ -272,5 +273,15 @@ class Memory {
   // getter do _expandedText
   String get expandedText {
     return _expandedText;
+  }
+
+  _changeValueSignal() {
+    double value = double.tryParse(_value) ?? 0;
+
+    value = value * -1;    
+
+    _wipeValue = true;
+    
+    _addDigit(_tryInt(value));
   }
 }
